@@ -8,6 +8,9 @@
 #ifndef BUDDHABROT_SERVER_EXTRACT_H
 #define BUDDHABROT_SERVER_EXTRACT_H
 
+#include <string.h>
+#include <stdlib.h>
+
 typedef struct _triordinate {
     double x;
     double y;

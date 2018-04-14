@@ -7,6 +7,6 @@
 
 #include "Vector2.h"
 
-VECTOR2(PixelCoord, x, y, int)
+VECTOR2(Coord, x, y, int)
 
 #endif //BUDDHABROT_SERVER_PIXEL_H

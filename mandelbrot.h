@@ -6,9 +6,10 @@
 #define BUDDHABROT_SERVER_MANDELBROT_H_H
 
 #include "Complex.h"
+#include "Color.h"
 
 _Bool hasEscaped(Complex num);
 int escapeSteps(Complex c);
-void buddhabrot(Complex centre, int zoom);
+Color* buddhabrot(Complex centre, int zoom);
 
 #endif //BUDDHABROT_SERVER_MANDELBROT_H_H

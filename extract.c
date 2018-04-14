@@ -8,6 +8,8 @@
 #define FALSE 0
 #define COORDINATE_START 49
 
+#include "extract.h"
+
 typedef struct _triordinate {
    double x;
    double y;
