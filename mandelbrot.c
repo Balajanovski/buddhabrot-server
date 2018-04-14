@@ -4,33 +4,56 @@
 // Calculates escape steps for complex number in mandelbrot function
 
 #include <math.h>
+#include <stdint.h>
+
+#include "mandelbrot.h"
+#include "Complex.h"
+#include "Bound.h"
 
 #define TRUE  1
 #define FALSE 0
 
-_Bool hasEscaped(double x, double y) {
+#define MAXIMUM_ITERATIONS 50
+
+#define IMAGE_SIZE 511
+
+
+
+_Bool hasEscaped(Complex num) {
    _Bool hasEscaped = FALSE;
-   if ((x*x + y*y) > 4) {
+   if ((num.real*num.real + num.imag*num.imag) > 4) {
       hasEscaped = TRUE;
    }
 
    return hasEscaped;
 }
 
-int escapeSteps(double x, double y) {
+int escapeSteps(Complex c) {
    int steps = 1;
-   double zX, zY;
-   zX = x;
-   zY = y;   
-   
-   double prevZX;
-   while (!hasEscaped(zX, zY) && steps < 256) {
-      prevZX = zX;
-      zX = (zX * zX) - (zY * zY) + x;
-      zY = (prevZX * zY * 2) + y;
+
+   Complex z = generateComplex(c.real, c.imag);
+
+   double prevZReal;
+   while (!hasEscaped(z) && steps < 256) {
+      prevZReal = z.real;
+      z.real = (z.real * z.real) - (z.imag * z.imag) + c.real;
+      z.imag = (prevZReal * z.imag * 2) + c.imag;
 
       ++steps;
    }
 
    return steps;
+}
+
+void buddhabrot(Complex centre, int zoom) {
+
+    // Initialising all variables needed for calculation
+    double pixelDistance = pow(2, -zoom);
+    double complexSize = IMAGE_SIZE * pixelDistance;
+
+    Bound complexDomain = generateBound(centre.real - complexSize, centre.real + complexSize);
+    Bound complexRange  = generateBound(centre.imag - complexSize, centre.imag + complexSize);
+
+    int pixelHistogram[IMAGE_SIZE * IMAGE_SIZE];
+
 }
