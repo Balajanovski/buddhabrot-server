@@ -15,6 +15,8 @@
 #include <assert.h>
 #include <unistd.h>
 
+#include "mandelbrot.h"
+
 int waitForConnection (int serverSocket);
 int makeServerSocket (int portno);
 void serveBMP (int socket);
@@ -26,7 +28,6 @@ void serveBMP (int socket);
 // after serving this many pages the server will halt
 
 int main (int argc, char *argv[]) {
-      
    printf ("************************************\n");
    printf ("Starting simple server %f\n", SIMPLE_SERVER_VERSION);
    printf ("Serving bmps since 2012\n");   
@@ -86,7 +87,7 @@ void serveBMP (int socket) {
    printf ("about to send=> %s\n", message);
    write (socket, message, strlen (message));
    
-   // now send the BMP
+   /*// now send the BMP
    unsigned char bmp[] = {
      0x42,0x4d,0x5a,0x00,0x00,0x00,0x00,0x00,
      0x00,0x00,0x36,0x00,0x00,0x00,0x28,0x00,
@@ -99,10 +100,20 @@ void serveBMP (int socket) {
      0x00,0x0e,0x07,0x07,0x07,0x66,0x07,0x07,
      0x07,0x07,0x07,0x00,0x00,0x0d,0x07,0x07,
      0x07,0x07,0x07,0x07,0xff,0xff,0xff,0x00,
-     0x00,0x0d};
+     0x00,0x0d};*/
 
+    uint8_t* bmp = generateBuddhabrot(generateComplex(-1.0, -0.2), 9);
 
-   write (socket, bmp, sizeof(bmp));
+    FILE* file = fopen("mandel.bmp", "w");
+    for (int y = 0; y < 512; ++y) {
+        for (int x = 0; x < (512 * 3); ++x) {
+            fwrite(&bmp[x + (y * 512)], 1, 1, file);
+        }
+    }
+    fclose(file);
+
+    write (socket, bmp, 512 * 512 * 3);
+    freeBuddhabrot();
 }
 
 

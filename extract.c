@@ -1,93 +1,82 @@
-/* extract.h
- *
- */
-
-#define BASE 10
-#define INFINITY 1000000000
-#define TRUE 1
-#define FALSE 0
-#define COORDINATE_START 49
+// James Balajan, James Balajan, z5218555
+// Hornsby, Stephen Leung
+// 15/04/18
+// Parses URL
 
 #include "extract.h"
 
-typedef struct _triordinate {
-   double x;
-   double y;
-   int z;
-} triordinate;
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <assert.h>
+#include <math.h>
 
-triordinate extract (char *message);
-double myAtoD (char* message);
-int myAtoL (char* message);
+#define INFO_START 48 // Where in the URL the info starts
 
-/*
-int main () {
-   char arr[1000];
-   scanf 
-
+void getNextField(char* message, char* buffer, int* i) {
+    int j = 0;
+    while (message[*i] != '/') {
+        buffer[j] = message[*i];
+        ++(*i); ++j;
+    }
+    ++(*i);
+    buffer[j] = '\0';
 }
-*/
 
 triordinate extract (char *message) {
-   triordinate response;
-   int start = COORDINATE_START;
-   int i = 0;
-   char* buffer = malloc(100 * sizeof char);
-   while (message[start + i] != "/") {
-      buffer[i] = message[start + i];
-      i++;
-   }
-   buffer[i++] = '\0';
-   response.z = myAtoL(buffer);
-   while ()
-   
+    triordinate response;
+    char buffer[100];
+
+    int i = INFO_START;
+
+    getNextField(message, buffer, &i);
+    response.z = myAtoL(buffer);
+
+    getNextField(message, buffer, &i);
+    response.x = myAtoD(buffer);
+
+    getNextField(message, buffer, &i);
+    response.y = myAtoD(buffer);
+
+    return response;
 }
 
 
 double myAtoD (char* message) {
-   double number = 0;
-   int negative = message[0] == '-';
-   int i = negative;
-   int decimal = 0;
-   int loop = TRUE;
-   int length = strlen(message);
-   while (loop) {
-      if (decimal > 0) {
-         decimal++;
-      }
-      if (message[i] == '.') {
-         decimal = 1;
-      } else {
-         number *= BASE;
-         number += message[i] - '0';
-      }
-      i++;
-   }
-   while (decimal > 1) {
-      number /= BASE;
-      decimal--;
-   }
-   if (negative) {
-      number = -number;
-   }
-   return number;
+    double val, power;
+    int i, sign;
+
+    i = 0;
+    sign = 1;
+
+    if (message[i] == '-') {
+        sign = -1;
+        ++i;
+    } else if (message[i] == '+') {
+        ++i;
+    }
+
+    val = 0.0;
+    while (isdigit(message[i])) {
+        val = 10.0 * val + (message[i] - '0');
+        ++i;
+    }
+
+    if (message[i] == '.') {
+        ++i;
+    }
+
+    power = 1.0;
+    while (isdigit(message[i])) {
+        val = 10.0 * val + (message[i] - '0');
+        power *= 10.0;
+        ++i;
+    }
+
+    return sign * val / power;
 }
 
-int myAtoL (char* message) {
-   int number = 0;
-   int negative = message[0] == '-';
-   int i = negative;
-   int loop = TRUE;
-   while (loop) {
-      if (message[i] == '\0') {
-         loop = FALSE;
-      } else {
-         number *= BASE;
-         number += message[i];
-      }
-   }
-   return number;
+long myAtoL (char* message) {
+    return (int) myAtoD(message);
 }
-
-
-

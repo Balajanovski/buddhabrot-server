@@ -13,13 +13,6 @@ typedef struct {
     uint8_t b;
 } Color;
 
-inline Color generateColor(uint8_t r, uint8_t g, uint8_t b) {
-    Color color;
-    color.r = r;
-    color.g = g;
-    color.b = b;
-
-    return color;
-}
+Color generateColor(uint8_t r, uint8_t g, uint8_t b);
 
 #endif //BUDDHABROT_SERVER_COLOR_H

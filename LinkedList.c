@@ -12,7 +12,7 @@ List* generateList(Complex val) {
     return newList;
 }
 
-List* appendList(List* list, Complex val) {
+void appendList(List* list, Complex val) {
     // Create the new node
     struct _Node* newNode = malloc(sizeof(struct _Node));
     newNode->next = NULL;
@@ -29,7 +29,7 @@ List* appendList(List* list, Complex val) {
     newNode->prev = lastNode;
 }
 
-List* prependList(List* list, Complex val) {
+void prependList(List* list, Complex val) {
     // Create the new node
     struct _Node* newNode = malloc(sizeof(struct _Node));
     newNode->prev = NULL;

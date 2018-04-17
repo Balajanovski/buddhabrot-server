@@ -5,8 +5,12 @@
 #ifndef BUDDHABROT_SERVER_PIXEL_H
 #define BUDDHABROT_SERVER_PIXEL_H
 
-#include "Vector2.h"
 
-VECTOR2(Coord, x, y, int)
+typedef struct {
+    int x;
+    int y;
+} Coord;
+
+Coord generateCoord(int x, int y);
 
 #endif //BUDDHABROT_SERVER_PIXEL_H

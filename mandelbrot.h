@@ -8,8 +8,7 @@
 #include "Complex.h"
 #include "Color.h"
 
-_Bool hasEscaped(Complex num);
-int escapeSteps(Complex c);
-Color* buddhabrot(Complex centre, int zoom);
+uint8_t* generateBuddhabrot(Complex centre, int zoom);
+void freeBuddhabrot();
 
 #endif //BUDDHABROT_SERVER_MANDELBROT_H_H

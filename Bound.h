@@ -5,8 +5,11 @@
 #ifndef BUDDHABROT_SERVER_BOUND_H
 #define BUDDHABROT_SERVER_BOUND_H
 
-#include "Vector2.h"
+typedef struct {
+    double lowerBound;
+    double upperBound;
+} Bound;
 
-VECTOR2(Bound, lowerBound, upperBound, double)
+Bound generateBound(double lowerBound, double upperBound);
 
 #endif //BUDDHABROT_SERVER_BOUND_H

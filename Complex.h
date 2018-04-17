@@ -5,8 +5,11 @@
 #ifndef BUDDHABROT_SERVER_COMPLEX_H
 #define BUDDHABROT_SERVER_COMPLEX_H
 
-#include "Vector2.h"
+typedef struct {
+    double real;
+    double imag;
+} Complex;
 
-VECTOR2(Complex, real, imag, double)
+Complex generateComplex(double real, double imag);
 
 #endif //BUDDHABROT_SERVER_COMPLEX_H

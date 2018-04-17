@@ -17,8 +17,8 @@ typedef struct _Node {
 } List;
 
 List* generateList(Complex val);
-List* appendList(List* list, Complex val);
-List* prependList(List* list, Complex val);
+void appendList(List* list, Complex val);
+void prependList(List* list, Complex val);
 void freeList(List* list);
 
 #endif //BUDDHABROT_SERVER_LINKEDLIST_H

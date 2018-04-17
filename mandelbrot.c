@@ -6,67 +6,93 @@
 #include <math.h>
 
 #include "mandelbrot.h"
-#include "Complex.h"
 #include "Bound.h"
 #include "Coord.h"
-#include "LinkedList.h"
+//#include "LinkedList.h"
+#include "BmpManager.h"
 
 #define TRUE  1
 #define FALSE 0
 
 #define MAXIMUM_ITERATIONS 256
 
-#define IMAGE_SIZE 511
+// Array of image data
+uint8_t* image;
 
-_Bool hasEscaped(Complex num) {
-   _Bool hasEscaped = FALSE;
-   if ((num.real*num.real + num.imag*num.imag) > 4) {
-      hasEscaped = TRUE;
-   }
+_Bool hasEscaped(Complex num);
+int escapeSteps(Complex c);
 
-   return hasEscaped;
-}
-
-int escapeSteps(Complex c) {
-   int steps = 1;
-
-   Complex z = generateComplex(c.real, c.imag);
-
-   double prevZReal;
-   while (!hasEscaped(z) && steps < MAXIMUM_ITERATIONS) {
-      prevZReal = z.real;
-      z.real = (z.real * z.real) - (z.imag * z.imag) + c.real;
-      z.imag = (prevZReal * z.imag * 2) + c.imag;
-
-      ++steps;
-   }
-
-   return steps;
-}
-
+/*
 Coord mapComplexToPixel(Complex c, double pixelDistance, Bound* complexDomain, Bound* complexRange) {
     return generateCoord((int) ((c.real - complexDomain->lowerBound) / pixelDistance),
-                         (int) ((c.imag - complexDomain->upperBound) / pixelDistance));
+                         (int) ((c.imag - complexRange->upperBound)  / pixelDistance));
 }
+*/
 
-Color* buddhabrot(Complex centre, int zoom) {
+uint8_t* generateBuddhabrot(Complex centre, int zoom) {
+
     // Initialising all variables needed for calculation
     double pixelDistance = pow(2, -zoom);
     double complexSize = IMAGE_SIZE * pixelDistance;
 
-    Bound complexDomain = generateBound(centre.real - complexSize, centre.real + complexSize);
-    Bound complexRange  = generateBound(centre.imag - complexSize, centre.imag + complexSize);
+    Bound complexDomain = generateBound(centre.real - (complexSize / 2), centre.real + (complexSize / 2));
+    Bound complexRange  = generateBound(centre.imag - (complexSize / 2), centre.imag + (complexSize / 2));
 
-    int pixelHistogram[IMAGE_SIZE * IMAGE_SIZE];
+    image = generateImage();
 
     Complex iterator = generateComplex(complexDomain.lowerBound,
                                        complexRange.upperBound); // Iterates across complex plane
-    while (iterator.imag > nextafter(complexRange.lowerBound, INFINITY)) {
-        while (iterator.real < nextafter(complexDomain.upperBound, INFINITY)) {
 
+    while (iterator.imag > complexRange.lowerBound) {
+        while (iterator.real < complexDomain.upperBound) {
+            uint8_t steps = escapeSteps(iterator);
 
-            iterator.real += pixelDistance;
+            Color pixelColor;
+            if (steps == MAXIMUM_ITERATIONS) {
+                pixelColor = generateColor(0, 0, 0);
+            } else {
+                pixelColor = generateColor(steps - 1, steps - 1, steps - 1);
+            }
+
+            drawPixel(pixelColor);
+
+            iterator.real += (pixelDistance);
         }
-        iterator.imag -= pixelDistance;
+        iterator.real = complexDomain.lowerBound;
+        iterator.imag -= (pixelDistance);
     }
+
+    return image;
+}
+
+void freeBuddhabrot() {
+    if (image != NULL) {
+        free(image);
+    }
+}
+
+_Bool hasEscaped(Complex num) {
+    _Bool hasEscaped = FALSE;
+    if ((num.real*num.real + num.imag*num.imag) > 4) {
+        hasEscaped = TRUE;
+    }
+
+    return hasEscaped;
+}
+
+int escapeSteps(Complex c) {
+    int steps = 1;
+
+    Complex z = generateComplex(c.real, c.imag);
+
+    double prevZReal;
+    while (!hasEscaped(z) && steps <= MAXIMUM_ITERATIONS) {
+        prevZReal = z.real;
+        z.real = (z.real * z.real) - (z.imag * z.imag) + c.real;
+        z.imag = (prevZReal * z.imag * 2) + c.imag;
+
+        ++steps;
+    }
+
+    return steps;
 }
