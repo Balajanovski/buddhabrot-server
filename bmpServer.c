@@ -14,6 +14,7 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+#include "extract.h"
 
 #include "mandelbrot.h"
 
@@ -52,7 +53,14 @@ int main (int argc, char *argv[]) {
       bytesRead = read (connectionSocket, request, (sizeof request)-1);
       assert (bytesRead >= 0); 
       // were we able to read any data from the connection?
-            
+      
+//TODO: Find content of GET (between second and third blankspaces)------------
+/*
+	if result is "/", run serveViewer()
+	else if result is "/x1_y1_z8" or something, using the extract function from tutlab:parsing, get the x,y and z values and pass them into serveBMP to display the mandelbrot
+	serveViewer() should work. everything else you'll need to implement unfortunately. 
+*/
+//-----------------------------------------------------------------------------
       // print entire request to the console 
       printf (" *** Received http request ***\n %s\n", request);
       
@@ -71,6 +79,17 @@ int main (int argc, char *argv[]) {
    close (serverSocket);
    
    return EXIT_SUCCESS; 
+}
+
+void serveViewer(int socket) {
+	char* message;
+	message = "HTTP/1.0 200 OK\r\n"
+                "Content-Type: image/bmp\r\n"
+                "\r\n"
+		"<!DOCTYPE html>\n"
+		"<script src=\"http://almondbread.cse.unsw.edu.au/tiles.js\"></script>";
+	printf("No image, sending => %s\n", message);
+	send (socket, messagem strlen(message), 0);
 }
 
 void serveBMP (int socket) {
@@ -179,3 +198,5 @@ int waitForConnection (int serverSocket) {
    
    return (connectionSocket);
 }
+
+char ()
