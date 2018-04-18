@@ -4,12 +4,14 @@
 // Calculates escape steps for complex number in mandelbrot function
 
 #include <math.h>
+#include <stdio.h>
 
 #include "mandelbrot.h"
 #include "Bound.h"
 #include "Coord.h"
 //#include "LinkedList.h"
 #include "BmpManager.h"
+#include "Complex.h"
 
 #define TRUE  1
 #define FALSE 0
@@ -20,14 +22,10 @@
 uint8_t* image;
 
 _Bool hasEscaped(Complex num);
-int escapeSteps(Complex c);
 
-/*
-Coord mapComplexToPixel(Complex c, double pixelDistance, Bound* complexDomain, Bound* complexRange) {
-    return generateCoord((int) ((c.real - complexDomain->lowerBound) / pixelDistance),
-                         (int) ((c.imag - complexRange->upperBound)  / pixelDistance));
-}
-*/
+// Calculates escape steps and then
+// avoids banding
+uint32_t color(Complex c);
 
 uint8_t* generateBuddhabrot(Complex centre, int zoom) {
 
@@ -45,15 +43,7 @@ uint8_t* generateBuddhabrot(Complex centre, int zoom) {
 
     while (iterator.imag > complexRange.lowerBound) {
         while (iterator.real < complexDomain.upperBound) {
-            uint8_t steps = escapeSteps(iterator);
-
-            Color pixelColor;
-            if (steps == MAXIMUM_ITERATIONS) {
-                pixelColor = generateColor(0, 0, 0);
-            } else {
-                pixelColor = generateColor(steps - 1, steps - 1, steps - 1);
-            }
-
+            uint32_t pixelColor = color(iterator);
             drawPixel(pixelColor);
 
             iterator.real += (pixelDistance);
@@ -71,20 +61,16 @@ void freeBuddhabrot() {
     }
 }
 
-_Bool hasEscaped(Complex num) {
-    _Bool hasEscaped = FALSE;
-    if ((num.real*num.real + num.imag*num.imag) > 4) {
-        hasEscaped = TRUE;
-    }
-
-    return hasEscaped;
+// Linear interpolation function
+unsigned int lerp(int a, int b, double factor) {
+    return (a + (b-a) * factor);
 }
 
-int escapeSteps(Complex c) {
-    int steps = 1;
-
+uint32_t color(Complex c) {
     Complex z = generateComplex(c.real, c.imag);
 
+    // Calculate steps until escape
+    unsigned int steps = 1;
     double prevZReal;
     while (!hasEscaped(z) && steps <= MAXIMUM_ITERATIONS) {
         prevZReal = z.real;
@@ -94,5 +80,29 @@ int escapeSteps(Complex c) {
         ++steps;
     }
 
-    return steps;
+    // Smooth iteration formula from:
+    // http://iquilezles.org/www/articles/mset_smooth/mset_smooth.htm
+    double sn = steps - log2(log2(z.real * z.real + z.imag * z.imag)) + 4.0;
+
+    // Colour palette
+    static const unsigned char r[] = {66,25,9 ,4 ,0  ,12 ,24, 57, 134,211,241,248,255,204,153,106};
+    static const unsigned char g[] = {30,7 ,1 ,4 ,7  ,44 ,82, 125,181,236,233,201,170,128,87, 52};
+    static const unsigned char b[] = {15,26,47,73,100,138,177,209,229,248,191,95, 0,  0,  0,  3};
+
+    // linearly interpolate between iteration count values using the decimal part
+    // of the smooth count
+    return lerp(r[((int)(sn))%sizeof r], r[((int)(sn + 1))%sizeof r], sn-((int)(sn)))*0x10000u
+           + lerp(g[((int)(sn))%sizeof r], g[((int)(sn + 1))%sizeof r], sn-((int)(sn)))*0x100u
+           + lerp(b[((int)(sn))%sizeof r], b[((int)(sn + 1))%sizeof r], sn-((int)(sn)))*0x1u;
+
+
+}
+
+_Bool hasEscaped(Complex num) {
+    _Bool hasEscaped = FALSE;
+    if ((num.real*num.real + num.imag*num.imag) > 4) {
+        hasEscaped = TRUE;
+    }
+
+    return hasEscaped;
 }

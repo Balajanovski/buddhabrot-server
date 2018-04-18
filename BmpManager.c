@@ -18,10 +18,6 @@
 #define DIB_HEADER_SIZE 40
 #define NUM_COLORS 0
 
-typedef unsigned char  bits8;
-typedef unsigned short bits16;
-typedef unsigned int   bits32;
-
 // Private variable representing the image data
 // According to the BMP specification
 uint8_t* image;
@@ -42,60 +38,55 @@ uint8_t* generateImage() {
 
     // From here on the code uses arrayWrite
     // to write the BMP header
-    bits16 magicNumber = MAGIC_NUMBER;
+    uint16_t magicNumber = MAGIC_NUMBER;
     arrayWrite (magicNumber, sizeof magicNumber, image);
 
     arrayWrite (fileSize, sizeof fileSize, image);
 
-    bits32 reserved = 0;
+    uint32_t reserved = 0;
     arrayWrite (reserved, sizeof reserved, image);
 
-    bits32 offset = OFFSET;
+    uint32_t offset = OFFSET;
     arrayWrite (offset, sizeof offset, image);
 
-    bits32 dibHeaderSize = DIB_HEADER_SIZE;
+    uint32_t dibHeaderSize = DIB_HEADER_SIZE;
     arrayWrite (dibHeaderSize, sizeof dibHeaderSize, image);
 
-    bits32 width = IMAGE_SIZE;
+    uint32_t width = IMAGE_SIZE;
     arrayWrite (width, sizeof width, image);
 
-    bits32 height = IMAGE_SIZE;
+    uint32_t height = IMAGE_SIZE;
     arrayWrite (height, sizeof height, image);
 
-    bits16 planes = NUMBER_PLANES;
+    uint16_t planes = NUMBER_PLANES;
     arrayWrite (planes, sizeof planes, image);
 
-    bits16 bitsPerPixel = BITS_PER_PIXEL;
+    uint16_t bitsPerPixel = BITS_PER_PIXEL;
     arrayWrite (bitsPerPixel, sizeof bitsPerPixel, image);
 
-    bits32 compression = NO_COMPRESSION;
+    uint32_t compression = NO_COMPRESSION;
     arrayWrite (compression, sizeof compression, image);
 
-    bits32 imageSize = (IMAGE_SIZE * IMAGE_SIZE * BYTES_PER_PIXEL);
+    uint32_t imageSize = (IMAGE_SIZE * IMAGE_SIZE * BYTES_PER_PIXEL);
     arrayWrite (imageSize, sizeof imageSize, image);
 
-    bits32 hResolution = PIX_PER_METRE;
+    uint32_t hResolution = PIX_PER_METRE;
     arrayWrite (hResolution, sizeof hResolution, image);
 
-    bits32 vResolution = PIX_PER_METRE;
+    uint32_t vResolution = PIX_PER_METRE;
     arrayWrite (vResolution, sizeof vResolution, image);
 
-    bits32 numColors = NUM_COLORS;
+    uint32_t numColors = NUM_COLORS;
     arrayWrite (numColors, sizeof numColors, image);
 
-    bits32 importantColors = NUM_COLORS;
+    uint32_t importantColors = NUM_COLORS;
     arrayWrite (importantColors, sizeof importantColors, image);
 
     return image;
 }
 
-void drawPixel(Color pixel) {
-    unsigned int pixelInteger = 0;
-    pixelInteger |= pixel.r;
-    pixelInteger |= (pixel.g << BITS_IN_BYTE);
-    pixelInteger |= (pixel.b << (2 * BITS_IN_BYTE));
-
-    arrayWrite(pixelInteger, BYTES_PER_PIXEL, image);
+void drawPixel(uint32_t pixel) {
+    arrayWrite(pixel, BYTES_PER_PIXEL, image);
 }
 
 void freeImage() {

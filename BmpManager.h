@@ -5,8 +5,6 @@
 #ifndef BUDDHABROT_SERVER_BMPMANAGER_H
 #define BUDDHABROT_SERVER_BMPMANAGER_H
 
-#include "Color.h"
-
 #include <stdlib.h>
 
 #define IMAGE_SIZE 512
@@ -18,7 +16,7 @@
 uint8_t* generateImage();
 
 // Draws pixel to image array
-void drawPixel(Color pixel);
+void drawPixel(uint32_t pixel);
 
 // Frees image array
 void freeImage();

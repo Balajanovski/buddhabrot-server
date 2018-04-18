@@ -4,7 +4,7 @@
  *
  *  Created by Tim Lambert on 02/04/12.
  *  Containing code created by Richard Buckland on 28/01/11.
- *  Copyright 2012 Licensed under Creative Commons SA-BY-NC 3.0. 
+ *  Copyright 2012 Licensed under Creative Commons SA-BY-NC 3.0.
  *
  */
 
@@ -13,14 +13,16 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 #include <unistd.h>
-#include "extract.h"
+#include "Xanadu.h"
 
 #include "mandelbrot.h"
 
 int waitForConnection (int serverSocket);
 int makeServerSocket (int portno);
 void serveBMP (int socket);
+void serveViewer(int socket);
 
 #define SIMPLE_SERVER_VERSION 1.0
 #define REQUEST_BUFFER_SIZE 1000
@@ -29,107 +31,85 @@ void serveBMP (int socket);
 // after serving this many pages the server will halt
 
 int main (int argc, char *argv[]) {
-   printf ("************************************\n");
-   printf ("Starting simple server %f\n", SIMPLE_SERVER_VERSION);
-   printf ("Serving bmps since 2012\n");   
-   
-   int serverSocket = makeServerSocket (DEFAULT_PORT);   
-   printf ("Access this server at http://localhost:%d/\n", DEFAULT_PORT);
-   printf ("************************************\n");
-   
-   char request[REQUEST_BUFFER_SIZE];
-   
-   int numberServed = 0;
-   while (numberServed < NUMBER_OF_PAGES_TO_SERVE) {
-      
-      printf ("*** So far served %d pages ***\n", numberServed);
-      
-      int connectionSocket = waitForConnection (serverSocket);
-      // wait for a request to be sent from a web browser, open a new
-      // connection for this conversation
-      
-      // read the first line of the request sent by the browser  
-      int bytesRead;
-      bytesRead = read (connectionSocket, request, (sizeof request)-1);
-      assert (bytesRead >= 0); 
-      // were we able to read any data from the connection?
-      
-//TODO: Find content of GET (between second and third blankspaces)------------
-/*
-	if result is "/", run serveViewer()
-	else if result is "/x1_y1_z8" or something, using the extract function from tutlab:parsing, get the x,y and z values and pass them into serveBMP to display the mandelbrot
-	serveViewer() should work. everything else you'll need to implement unfortunately. 
-*/
-//-----------------------------------------------------------------------------
-      // print entire request to the console 
-      printf (" *** Received http request ***\n %s\n", request);
-      
-      //send the browser a simple html page using http
-      printf (" *** Sending http response ***\n");
-      serveBMP(connectionSocket);
-      
-      // close the connection after sending the page- keep aust beautiful
-      close(connectionSocket);
-      
-      numberServed++;
-   } 
-   
-   // close the server connection after we are done- keep aust beautiful
-   printf ("** shutting down the server **\n");
-   close (serverSocket);
-   
-   return EXIT_SUCCESS; 
+    printf ("************************************\n");
+    printf ("Starting simple server %f\n", SIMPLE_SERVER_VERSION);
+    printf ("Serving bmps since 2012\n");
+
+    int serverSocket = makeServerSocket (DEFAULT_PORT);
+    printf ("Access this server at http://localhost:%d/\n", DEFAULT_PORT);
+    printf ("************************************\n");
+
+    char request[REQUEST_BUFFER_SIZE];
+
+    int numberServed = 0;
+    while (numberServed < NUMBER_OF_PAGES_TO_SERVE) {
+
+        printf ("*** So far served %d pages ***\n", numberServed);
+
+        int connectionSocket = waitForConnection (serverSocket);
+        // wait for a request to be sent from a web browser, open a new
+        // connection for this conversation
+
+        // read the first line of the request sent by the browser
+        int bytesRead;
+        bytesRead = read (connectionSocket, request, (sizeof request)-1);
+        assert (bytesRead >= 0);
+        // were we able to read any data from the connection?
+
+        //TODO: Find content of GET (between second and third blankspaces)------------
+        /*
+        if result is "/", run serveViewer()
+        else if result is "/x1_y1_z8" or something, using the extract function from tutlab:parsing, get the x,y and z values and pass them into serveBMP to display the mandelbrot
+        serveViewer() should work. everything else you'll need to implement unfortunately.
+        */
+        //-----------------------------------------------------------------------------
+
+        // print entire request to the console
+        printf (" *** Received http request ***\n %s\n", request);
+
+        //send the browser a simple html page using http
+        printf (" *** Sending http response ***\n");
+        serveBMP(connectionSocket);
+
+        // close the connection after sending the page- keep aust beautiful
+        close(connectionSocket);
+
+        numberServed++;
+    }
+
+    // close the server connection after we are done- keep aust beautiful
+    printf ("** shutting down the server **\n");
+    close (serverSocket);
+
+    return EXIT_SUCCESS;
 }
 
 void serveViewer(int socket) {
-	char* message;
-	message = "HTTP/1.0 200 OK\r\n"
+    char* message;
+    message = "HTTP/1.0 200 OK\r\n"
                 "Content-Type: image/bmp\r\n"
                 "\r\n"
-		"<!DOCTYPE html>\n"
-		"<script src=\"http://almondbread.cse.unsw.edu.au/tiles.js\"></script>";
-	printf("No image, sending => %s\n", message);
-	send (socket, messagem strlen(message), 0);
+        "<!DOCTYPE html>\n"
+        "<script src=\"http://almondbread.cse.unsw.edu.au/tiles.js\"></script>";
+    printf("No image, sending => %s\n", message);
+    send (socket, message, strlen(message), 0);
 }
 
 void serveBMP (int socket) {
-   char* message;
-   
-   // first send the http response header
-   
-   // (if you write stings one after another like this on separate
-   // lines the c compiler kindly joins them togther for you into
-   // one long string)
-   message = "HTTP/1.0 200 OK\r\n"
+    char* message;
+
+    // first send the http response header
+
+    // (if you write stings one after another like this on separate
+    // lines the c compiler kindly joins them togther for you into
+    // one long string)
+    message = "HTTP/1.0 200 OK\r\n"
                 "Content-Type: image/bmp\r\n"
                 "\r\n";
-   printf ("about to send=> %s\n", message);
-   write (socket, message, strlen (message));
-   
-   /*// now send the BMP
-   unsigned char bmp[] = {
-     0x42,0x4d,0x5a,0x00,0x00,0x00,0x00,0x00,
-     0x00,0x00,0x36,0x00,0x00,0x00,0x28,0x00,
-     0x00,0x00,0x03,0x00,0x00,0x00,0x03,0x00,
-     0x00,0x00,0x01,0x00,0x18,0x00,0x00,0x00,
-     0x00,0x00,0x24,0x00,0x00,0x00,0x13,0x0b,
-     0x00,0x00,0x13,0x0b,0x00,0x00,0x00,0x00,
-     0x00,0x00,0x00,0x00,0x00,0x00,0x07,0x07,
-     0xff,0x07,0x07,0x07,0x07,0x07,0xff,0x00,
-     0x00,0x0e,0x07,0x07,0x07,0x66,0x07,0x07,
-     0x07,0x07,0x07,0x00,0x00,0x0d,0x07,0x07,
-     0x07,0x07,0x07,0x07,0xff,0xff,0xff,0x00,
-     0x00,0x0d};*/
+    printf ("about to send=> %s\n", message);
+    write (socket, message, strlen (message));
 
-    uint8_t* bmp = generateBuddhabrot(generateComplex(-1.0, -0.2), 9);
-
-    FILE* file = fopen("mandel.bmp", "w");
-    for (int y = 0; y < 512; ++y) {
-        for (int x = 0; x < (512 * 3); ++x) {
-            fwrite(&bmp[x + (y * 512)], 1, 1, file);
-        }
-    }
-    fclose(file);
+    uint8_t* bmp = generateBuddhabrot(generateComplex(CENTER_X, CENTER_Y), ZOOM);
 
     write (socket, bmp, 512 * 512 * 3);
     freeBuddhabrot();
@@ -137,43 +117,43 @@ void serveBMP (int socket) {
 
 
 // start the server listening on the specified port number
-int makeServerSocket (int portNumber) { 
-   
-   // create socket
-   int serverSocket = socket (AF_INET, SOCK_STREAM, 0);
-   assert (serverSocket >= 0);   
-   // error opening socket
-   
-   // bind socket to listening port
-   struct sockaddr_in serverAddress;
-   memset ((char *) &serverAddress, 0,sizeof (serverAddress));
-   
-   serverAddress.sin_family      = AF_INET;
-   serverAddress.sin_addr.s_addr = INADDR_ANY;
-   serverAddress.sin_port        = htons (portNumber);
-   
-   // let the server start immediately after a previous shutdown
-   int optionValue = 1;
-   setsockopt (
+int makeServerSocket (int portNumber) {
+
+    // create socket
+    int serverSocket = socket (AF_INET, SOCK_STREAM, 0);
+    assert (serverSocket >= 0);
+    // error opening socket
+
+    // bind socket to listening port
+    struct sockaddr_in serverAddress;
+    memset ((char *) &serverAddress, 0,sizeof (serverAddress));
+
+    serverAddress.sin_family      = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port        = htons (portNumber);
+
+    // let the server start immediately after a previous shutdown
+    int optionValue = 1;
+    setsockopt (
       serverSocket,
       SOL_SOCKET,
       SO_REUSEADDR,
-      &optionValue, 
+      &optionValue,
       sizeof(int)
-   );
+    );
 
-   int bindSuccess = 
+    int bindSuccess =
       bind (
-         serverSocket, 
+         serverSocket,
          (struct sockaddr *) &serverAddress,
          sizeof (serverAddress)
       );
-   
-   assert (bindSuccess >= 0);
-   // if this assert fails wait a short while to let the operating 
-   // system clear the port before trying again
-   
-   return serverSocket;
+
+    assert (bindSuccess >= 0);
+    // if this assert fails wait a short while to let the operating
+    // system clear the port before trying again
+
+    return serverSocket;
 }
 
 // wait for a browser to request a connection,
@@ -182,21 +162,20 @@ int waitForConnection (int serverSocket) {
    // listen for a connection
    const int serverMaxBacklog = 10;
    listen (serverSocket, serverMaxBacklog);
-   
+
    // accept the connection
    struct sockaddr_in clientAddress;
    socklen_t clientLen = sizeof (clientAddress);
-   int connectionSocket = 
+   int connectionSocket =
       accept (
-         serverSocket, 
-         (struct sockaddr *) &clientAddress, 
+         serverSocket,
+         (struct sockaddr *) &clientAddress,
          &clientLen
       );
-   
+
    assert (connectionSocket >= 0);
    // error on accept
-   
+
    return (connectionSocket);
 }
 
-char ()
