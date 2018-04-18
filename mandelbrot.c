@@ -39,9 +39,9 @@ uint8_t* generateBuddhabrot(Complex centre, int zoom) {
     image = generateImage();
 
     Complex iterator = generateComplex(complexDomain.lowerBound,
-                                       complexRange.upperBound); // Iterates across complex plane
+                                       complexRange.lowerBound); // Iterates across complex plane
 
-    while (iterator.imag > complexRange.lowerBound) {
+    while (iterator.imag < complexRange.upperBound) {
         while (iterator.real < complexDomain.upperBound) {
             uint32_t pixelColor = color(iterator);
             drawPixel(pixelColor);
@@ -49,7 +49,7 @@ uint8_t* generateBuddhabrot(Complex centre, int zoom) {
             iterator.real += (pixelDistance);
         }
         iterator.real = complexDomain.lowerBound;
-        iterator.imag -= (pixelDistance);
+        iterator.imag += (pixelDistance);
     }
 
     return image;

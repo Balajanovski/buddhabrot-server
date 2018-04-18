@@ -15,7 +15,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <unistd.h>
-#include "Xanadu.h"
+#include "xanadu.h"
 
 #include "mandelbrot.h"
 
