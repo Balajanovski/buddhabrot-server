@@ -27,7 +27,7 @@ _Bool hasEscaped(Complex num);
 // avoids banding
 uint32_t color(Complex c);
 
-uint8_t* generateBuddhabrot(Complex centre, int zoom) {
+uint8_t* generateMandelbrot(Complex centre, int zoom) {
 
     // Initialising all variables needed for calculation
     double pixelDistance = pow(2, -zoom);
@@ -55,7 +55,7 @@ uint8_t* generateBuddhabrot(Complex centre, int zoom) {
     return image;
 }
 
-void freeBuddhabrot() {
+void freeMandelbrot() {
     if (image != NULL) {
         free(image);
     }

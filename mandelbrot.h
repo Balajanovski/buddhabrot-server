@@ -8,7 +8,7 @@
 #include "Complex.h"
 #include "Color.h"
 
-uint8_t* generateBuddhabrot(Complex centre, int zoom);
-void freeBuddhabrot();
+uint8_t* generateMandelbrot(Complex centre, int zoom);
+void freeMandelbrot();
 
 #endif //BUDDHABROT_SERVER_MANDELBROT_H_H

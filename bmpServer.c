@@ -109,10 +109,10 @@ void serveBMP (int socket) {
     printf ("about to send=> %s\n", message);
     write (socket, message, strlen (message));
 
-    uint8_t* bmp = generateBuddhabrot(generateComplex(CENTER_X, CENTER_Y), ZOOM);
+    uint8_t* bmp = generateMandelbrot(generateComplex(CENTER_X, CENTER_Y), ZOOM);
 
     write (socket, bmp, 512 * 512 * 3);
-    freeBuddhabrot();
+    freeMandelbrot();
 }
 
 
